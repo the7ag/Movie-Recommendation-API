@@ -182,7 +182,7 @@ app.get('/', (req, res) => {
     }
   });
   app.post('/login', async (req, res) => {
-    const { email, password } = req.body;..\
+    const { email, password } = req.body;
     try
     {
     const query = `SELECT * FROM users WHERE email = '${email}' AND password = '${password}'`;
