@@ -3,6 +3,7 @@ from models.content_based_filtering import KNNRecommender
 from models.collaborative_filtering import AutoEncoder
 from flask import Flask, request
 import pandas as pd
+import json
 
 url = "postgres://default:I6v0XghdjVAW@ep-nameless-forest-a4upu4jj.us-east-1.aws.neon.tech:5432/verceldb"
 app = Flask(__name__)
@@ -21,7 +22,7 @@ def process_data():
         ratings = db.get_ratings(data['id'])
         recommendations = knn.predict(ratings)
     db.update_recommendations(data['id'], recommendations)
-    return 'Recommendations updated'
+    return recommendations.to_json(orient='records')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=3000)
+    app.run(debug=True, port=5000)
