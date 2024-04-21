@@ -24,8 +24,6 @@ class KNNRecommender:
         movies['genres'].fillna('other', inplace=True)
         movies['genres'] = movies['genres'].apply(self._format)
         movies['cast'] = movies['cast'].apply(self._format)
-        
-        movies['movieid'] = movies['movieid'].astype(str)
         movieid_map = movies[['movieid']].reset_index()
         movieid_map.to_csv('../data/movieids.csv', index=False)
         
