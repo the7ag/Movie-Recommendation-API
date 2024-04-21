@@ -24,6 +24,11 @@ class DB:
         popular_movies['movieid'] = popular_movies['movieid'].astype(str)
         popular_movies = popular_movies.drop(columns=['score'])
         return popular_movies
+    
+    def get_watch_count(self, user_id):
+        self.cursor.execute("SELECT count(rating) FROM ratings WHERE userid = %s;", (str(user_id),))
+        count = self.cursor.fetchone()[0]
+        return count
 
     def get_movie_titles(self, movie_ids):
         self.cursor.execute("SELECT movieid, title FROM movies WHERE movieid = ANY(%s);", (movie_ids,))

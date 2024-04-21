@@ -1,3 +1,4 @@
+import os
 import joblib
 import pandas as pd
 from scipy.sparse import hstack
@@ -7,11 +8,15 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 class KNNRecommender:
     def __init__(self):
-        self.features = joblib.load('knn_features.dump')
+        self.dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.knn_path = os.path.join(self.dir_path, 'knn_features.dump')
+        self.movieid_path = os.path.join(self.dir_path, '../data/movieids.csv')
+        
+        self.features = joblib.load(self.knn_path)
         self.knn = NearestNeighbors(n_neighbors=10, metric='euclidean')
         self.knn.fit(self.features)
-        self.movieid_map = pd.read_csv('../data/movieids.csv', index_col='index')
-
+        self.movieid_map = pd.read_csv(self.movieid_path, index_col='index')
+        
 
     def _format(features):
         features = features.replace('{', '').replace('}', '').replace('"', '').split(',')
@@ -25,14 +30,14 @@ class KNNRecommender:
         movies['genres'] = movies['genres'].apply(self._format)
         movies['cast'] = movies['cast'].apply(self._format)
         movieid_map = movies[['movieid']].reset_index()
-        movieid_map.to_csv('../data/movieids.csv', index=False)
+        movieid_map.to_csv(self.movieid_path, index=False)
         
         vectorizer = CountVectorizer()
         title = vectorizer.fit_transform(movies['title'])
         genres = vectorizer.fit_transform(movies['genres'])
         cast = vectorizer.fit_transform(movies['cast'])
         features = hstack([title, genres, cast])
-        joblib.dump(features, 'knn_features.dump')
+        joblib.dump(features, self.knn_path)
     
     
     def predict(self, ratings):
