@@ -38,8 +38,8 @@ class AutoEncoder:
         user_input = tf.keras.layers.Input(shape=(1,), name='user_input')
         movie_input = tf.keras.layers.Input(shape=(1,), name='movie_input')
 
-        user_embedding = tf.keras.layers.Embedding(input_dim=len(user_id_map), output_dim=32, name='user_embedding')(user_input)
-        movie_embedding = tf.keras.layers.Embedding(input_dim=len(movie_id_map), output_dim=32, name='movie_embedding')(movie_input)
+        user_embedding = tf.keras.layers.Embedding(input_dim=len(self.userid_map), output_dim=32, name='user_embedding')(user_input)
+        movie_embedding = tf.keras.layers.Embedding(input_dim=len(self.movieid_map), output_dim=32, name='movie_embedding')(movie_input)
         concat = tf.keras.layers.Concatenate(name='concat')([tf.keras.layers.Flatten()(user_embedding), tf.keras.layers.Flatten()(movie_embedding)])
         concat = tf.keras.layers.Dropout(0.5, name='dropout_1')(concat)
 
