@@ -21,8 +21,7 @@ class DB:
             LIMIT %s;
             """, (n,))
         popular_movies = pd.DataFrame(self.cursor.fetchall(), columns=['movieid', 'score'])
-        popular_movies['movieid'] = popular_movies['movieid'].astype(str)
-        popular_movies = popular_movies.drop(columns=['score'])
+        popular_movies = popular_movies['movieid'].astype(str).tolist()
         return popular_movies
     
     def get_watch_count(self, user_id):

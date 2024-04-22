@@ -9,8 +9,8 @@ from sklearn.feature_extraction.text import CountVectorizer
 class KNNRecommender:
     def __init__(self):
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.knn_path = os.path.join(self.dir_path, 'knn_features.dump')
-        self.movieid_path = os.path.join(self.dir_path, '../data/movieids.csv')
+        self.knn_path = os.path.join(self.dir_path, '../data/KNN/knn_features.dump')
+        self.movieid_path = os.path.join(self.dir_path, '../data/KNN/knn_movieids.csv')
         
         self.features = joblib.load(self.knn_path)
         self.knn = NearestNeighbors(n_neighbors=10, metric='euclidean')
@@ -22,7 +22,9 @@ class KNNRecommender:
         features = features.replace('{', '').replace('}', '').replace('"', '').split(',')
         features = [f.replace(' ', '') for f in features]
         return ' '.join(features)
-
+    
+    def check(self, movieids):
+        return all(movieids.isin(self.movieid_map['movieid']))
 
     def train(self, movies):      
         movies['cast'].fillna('unknown', inplace=True)
@@ -49,7 +51,7 @@ class KNNRecommender:
             indices = indices.flatten()
             distances = distances.flatten()
             distances = distances / (ratings[ratings['movieid'] == \
-                self.movieid_map.loc[movieid, 'movieid']]['rating'].values[0])**2
+                self.movieid_map.loc[movieid, 'movieid']]['rating'].values[0])
             
             for index, distance in zip(indices, distances):
                 if index in moviedict:
