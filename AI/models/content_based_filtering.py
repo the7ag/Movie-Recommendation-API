@@ -18,15 +18,16 @@ class KNNRecommender:
         self.movieid_map = pd.read_csv(self.movieid_path, index_col='index')
         
 
-    def _format(features):
-        features = features.replace('{', '').replace('}', '').replace('"', '').split(',')
+    def _format(self, features):
+        # features = features.replace('{', '').replace('}', '')\
+        #     .replace('[', '').replace(']', '').replace('"', '').split(',')
         features = [f.replace(' ', '') for f in features]
         return ' '.join(features)
     
     def check(self, movieids):
         return all(movieids.isin(self.movieid_map['movieid']))
 
-    def train(self, movies):      
+    def train(self, movies):
         movies['cast'].fillna('unknown', inplace=True)
         movies['genres'].fillna('other', inplace=True)
         movies['genres'] = movies['genres'].apply(self._format)
@@ -43,7 +44,7 @@ class KNNRecommender:
     
     
     def predict(self, ratings):
-        movieids = self.movieid_map[self.movieid_map['movieid'].isin(ratings['movieid'])]['index']
+        movieids = self.movieid_map[self.movieid_map['movieid'].isin(ratings['movieid'])].index
         moviedict = {}
         for movieid in movieids:
             features = self.features[movieid]
@@ -60,7 +61,7 @@ class KNNRecommender:
                     moviedict[index] = distance
         
         moviedict = dict(sorted(moviedict.items(), key=lambda item: item[1]))
-        recs = self.movieid_map[self.movieid_map['index'].isin(moviedict.keys())]['movieid']
+        recs = self.movieid_map[self.movieid_map.index.isin(moviedict.keys())]['movieid']
         recs = recs[~recs.isin(ratings['movieid'])]
         recs = recs.tolist()[:10]
         return recs

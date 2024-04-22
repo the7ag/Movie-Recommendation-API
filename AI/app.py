@@ -30,16 +30,16 @@ def process_data():
         recommendations = db2.popular_movies()
     else:
         ratings = db2.get_ratings(data['id'])
-        # print(db1.get_movie_titles(ratings['movieid'])) # Debugging
+        print(db1.get_movie_titles(ratings['movieid'])) # Debugging
         
         if not knn.check(ratings['movieid']):
-            knn.train(db1.get_all_movieids())
+            knn.train(db1.get_table('movies'))
         recommendations = knn.predict(ratings)
         
-        if ae.check(data['id'], ratings['movieid']):
+        if ae.check(data['id'], recommendations):
             recommendations = ae.sort(data['id'], recommendations)
         
-    # print(db1.get_movie_titles(recommendations)) # Debugging
+    print(db1.get_movie_titles(recommendations)) # Debugging
     db1.update_recommendations(data['id'], recommendations)
     db2.update_recommendations(data['id'], recommendations)
     return json.dumps({'recommendations': recommendations})

@@ -30,6 +30,7 @@ class DB:
         return count
 
     def get_movie_titles(self, movie_ids):
+        movie_ids = [str(x) for x in movie_ids]
         self.cursor.execute("SELECT movieid, title FROM movies WHERE movieid = ANY(%s);", (movie_ids,))
         movie_titles = pd.DataFrame(self.cursor.fetchall(), columns=['movieid', 'title'])
         movie_titles['movieid'] = movie_titles['movieid'].astype(str)
@@ -47,8 +48,13 @@ class DB:
         movieids['movieid'] = movieids['movieid'].astype(str)
         return movieids
     
+    def get_table(self, table):
+        self.cursor.execute(f"SELECT * FROM {table};")
+        table = pd.DataFrame(self.cursor.fetchall(), columns=[desc[0] for desc in self.cursor.description])
+        return table
+    
     def update_recommendations(self, user_id, recommendations):
-        recommendations_tuples = [tuple(x) for x in recommendations.values]
+        recommendations_tuples = [tuple(x) for x in recommendations]
         self.cursor.execute("UPDATE users SET recommendation = %s WHERE userid = %s;", (recommendations_tuples, str(user_id),))
         self.conn.commit()
     
