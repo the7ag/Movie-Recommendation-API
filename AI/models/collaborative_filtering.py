@@ -13,11 +13,13 @@ class AutoEncoder:
         self.userid_path = os.path.join(self.dir_path, '../data/AutoEncoder/ae_userids.csv')
         
         self.model = tf.keras.models.load_model(self.model_path)
-        self.movieid_map = pd.read_csv(self.movieid_path, index_col='index')
-        self.userid_map = pd.read_csv(self.userid_path, index_col='index')
+        self.movieid_map = pd.read_csv(self.movieid_path)
+        self.userid_map = pd.read_csv(self.userid_path)
         
     def check(self, userid, movieids):
-        return (userid in self.userid_map['userid']) and all(movieids.isin(self.movieid_map['movieid']))
+        df = pd.DataFrame()
+        df['movieid'] = movieids
+        return (userid in self.userid_map['userid']) and all(df['movieid'].isin(self.movieid_map['movieid']))
     
     def train(self, ratings):
         # load data
@@ -59,8 +61,8 @@ class AutoEncoder:
         return np.sum(prediction * np.arange(1, 11))
     
     def sort(self, userid, movieids):
-        userid = self.userid_map[self.userid_map['userid'] == userid].index[0]
-        movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)].index
+        userid = self.userid_map[self.userid_map['userid'] == userid]['index'].values[0]
+        movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
         predictions = []
         for movieid in movieids:
             prediction = self.model.predict([np.array([userid]), np.array([movieid])])

@@ -15,7 +15,8 @@ class KNNRecommender:
         self.features = joblib.load(self.knn_path)
         self.knn = NearestNeighbors(n_neighbors=10, metric='euclidean')
         self.knn.fit(self.features)
-        self.movieid_map = pd.read_csv(self.movieid_path, index_col='index')
+        self.movieid_map = pd.read_csv(self.movieid_path)
+        self.movieid_map['movieid'] = self.movieid_map['movieid'].astype(str)
         
 
     def _format(self, features):
@@ -44,11 +45,12 @@ class KNNRecommender:
     
     
     def predict(self, ratings):
-        movieids = self.movieid_map[self.movieid_map['movieid'].isin(ratings['movieid'])].index
+        movieids = self.movieid_map[self.movieid_map['movieid'].isin(ratings['movieid'])]['index']
         moviedict = {}
         for movieid in movieids:
             features = self.features[movieid]
             distances, indices = self.knn.kneighbors(features)
+            print(distances, indices)
             indices = indices.flatten()
             distances = distances.flatten()
             distances = distances / (ratings[ratings['movieid'] == \
@@ -61,7 +63,7 @@ class KNNRecommender:
                     moviedict[index] = distance
         
         moviedict = dict(sorted(moviedict.items(), key=lambda item: item[1]))
-        recs = self.movieid_map[self.movieid_map.index.isin(moviedict.keys())]['movieid']
+        recs = self.movieid_map[self.movieid_map['index'].isin(moviedict.keys())]['movieid']
         recs = recs[~recs.isin(ratings['movieid'])]
         recs = recs.tolist()[:10]
         return recs
