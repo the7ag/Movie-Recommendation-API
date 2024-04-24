@@ -26,7 +26,7 @@ class KNNRecommender:
         return ' '.join(features)
     
     def check(self, movieids):
-        return all(movieids.isin(self.movieid_map['movieid']))
+        return movieids.isin(self.movieid_map['movieid']).all()
 
     def train(self, movies):
         movies['cast'].fillna('unknown', inplace=True)
@@ -50,7 +50,6 @@ class KNNRecommender:
         for movieid in movieids:
             features = self.features[movieid]
             distances, indices = self.knn.kneighbors(features)
-            print(distances, indices)
             indices = indices.flatten()
             distances = distances.flatten()
             distances = distances / (ratings[ratings['movieid'] == \
@@ -61,9 +60,9 @@ class KNNRecommender:
                     moviedict[index] = min(moviedict[index], distance)
                 else:
                     moviedict[index] = distance
-        
-        moviedict = dict(sorted(moviedict.items(), key=lambda item: item[1]))
-        recs = self.movieid_map[self.movieid_map['index'].isin(moviedict.keys())]['movieid']
+                    
+        recs = [key for key, _ in sorted(moviedict.items(), key=lambda item: item[1])]
+        recs = self.movieid_map.loc[recs, 'movieid']
         recs = recs[~recs.isin(ratings['movieid'])]
         recs = recs.tolist()[:10]
         return recs

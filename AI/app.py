@@ -30,22 +30,23 @@ def process_data():
         recommendations = db_offline.popular_movies()
     else:
         ratings = db_offline.get_ratings(data['id'])
-        print(f"user {data['id']} watched movies:")
-        print(db_offline.get_movie_titles(ratings['movieid'])) # Debugging
+        print(f"\nuser {data['id']} watched movies:")
+        print(db_offline.get_movie_titles(ratings['movieid']))
         
-        # if not knn.check(ratings['movieid']):
-        #     print("Retraining KNN...")
-        #     knn.train(db_offline.get_table('movies'))
+        if not knn.check(ratings['movieid']):
+            print("\nRetraining KNN...")
+            knn.train(db_offline.get_table('movies'))
         
+        print("\nSearching Using Content Based Filtering...")
         recommendations = knn.predict(ratings)
-        print("Recommendation:", recommendations)
-        
-        # if ae.check(data['id'], recommendations):
-        #     print("Sorting Using Collabritive Filtering")
-        #     recommendations = ae.sort(data['id'], recommendations)
+                        
+        if ae.check(data['id'], recommendations):
+            print("\nSorting Using Collabritive Filtering...")
+            recommendations = ae.sort(data['id'], recommendations)
+            
     
-    print(f"user {data['id']} recommended movies:")
-    print(db_offline.get_movie_titles(recommendations)) # Debugging
+    print(f"\nuser {data['id']} recommended movies:")
+    print(db_offline.get_movie_titles(recommendations))
     # db_online.update_recommendations(data['id'], recommendations)
     db_offline.update_recommendations(data['id'], recommendations)
     return json.dumps({'recommendations': recommendations})

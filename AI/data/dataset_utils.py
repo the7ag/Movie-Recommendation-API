@@ -54,9 +54,7 @@ class DB:
         return table
     
     def update_recommendations(self, user_id, recommendations):
-        # recommendations_tuples = [tuple(x) for x in recommendations]
         string = "{\"" + '\",\"'.join(recommendations) +"\"}"
-        print(string)
         self.cursor.execute("UPDATE users SET recommendation = %s WHERE userid = %s;", (string, str(user_id),))
         self.conn.commit()
     

@@ -1,8 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import tensorflow as tf
 
 
 class AutoEncoder:
@@ -15,11 +15,13 @@ class AutoEncoder:
         self.model = tf.keras.models.load_model(self.model_path)
         self.movieid_map = pd.read_csv(self.movieid_path)
         self.userid_map = pd.read_csv(self.userid_path)
+        self.movieid_map['movieid'] = self.movieid_map['movieid'].astype(str)
+        self.userid_map['userid'] = self.userid_map['userid'].astype(str)
         
     def check(self, userid, movieids):
         df = pd.DataFrame()
         df['movieid'] = movieids
-        return (userid in self.userid_map['userid']) and all(df['movieid'].isin(self.movieid_map['movieid']))
+        return (str(userid) in self.userid_map['userid'].values) and df['movieid'].isin(self.movieid_map['movieid'].astype(str)).all()
     
     def train(self, ratings):
         # load data
@@ -61,7 +63,7 @@ class AutoEncoder:
         return np.sum(prediction * np.arange(1, 11))
     
     def sort(self, userid, movieids):
-        userid = self.userid_map[self.userid_map['userid'] == userid]['index'].values[0]
+        userid = self.userid_map[self.userid_map['userid'] == str(userid)]['index'].values[0]
         movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
         predictions = []
         for movieid in movieids:
@@ -71,4 +73,5 @@ class AutoEncoder:
         
         predictions = sorted(predictions, key=lambda x: x[1])
         sorted_movieids = [movieid for movieid, _ in predictions]
+        sorted_movieids = self.movieid_map.loc[sorted_movieids, 'movieid'].tolist()
         return sorted_movieids
