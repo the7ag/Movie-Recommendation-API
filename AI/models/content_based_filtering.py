@@ -64,5 +64,5 @@ class KNNRecommender:
         recs = [key for key, _ in sorted(moviedict.items(), key=lambda item: item[1])]
         recs = self.movieid_map.loc[recs, 'movieid']
         recs = recs[~recs.isin(ratings['movieid'])]
-        recs = recs.tolist()[:10]
+        recs = recs.tolist()[:20]
         return recs

@@ -67,11 +67,11 @@ class AutoEncoder:
         movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
         predictions = []
         for movieid in movieids:
-            prediction = self.model.predict([np.array([userid]), np.array([movieid])])
+            prediction = self.model.predict([np.array([userid]), np.array([movieid])], verbose=0)
             prediction = self.smooth_score(prediction)
             predictions.append((movieid, prediction))
         
         predictions = sorted(predictions, key=lambda x: x[1])
         sorted_movieids = [movieid for movieid, _ in predictions]
-        sorted_movieids = self.movieid_map.loc[sorted_movieids, 'movieid'].tolist()
+        sorted_movieids = self.movieid_map.loc[sorted_movieids, 'movieid'].tolist()[:10]
         return sorted_movieids
