@@ -8,7 +8,7 @@ import tensorflow as tf
 class AutoEncoder:
     def __init__(self):
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
-        self.model_path = os.path.join(self.dir_path, '../data/AutoEncoder/ae_model.keras')
+        self.model_path = os.path.join(self.dir_path, '../data/AutoEncoder/ae_model.h5')
         self.movieid_path = os.path.join(self.dir_path, '../data/AutoEncoder/ae_movieids.csv')
         self.userid_path = os.path.join(self.dir_path, '../data/AutoEncoder/ae_userids.csv')
         
