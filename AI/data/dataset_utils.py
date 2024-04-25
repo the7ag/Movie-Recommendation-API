@@ -5,6 +5,10 @@ class DB:
     def __init__(self, *args, **kwargs):
         self.conn = psycopg2.connect(*args, **kwargs)
         self.cursor = self.conn.cursor()
+        
+    def check_user(self, user_id):
+        self.cursor.execute("SELECT * FROM users WHERE userid = %s;", (str(user_id),))
+        return bool(self.cursor.fetchone())
     
     def get_ratings(self, user_id):
         self.cursor.execute("SELECT movieid, rating FROM ratings WHERE userid = %s;", (str(user_id),))

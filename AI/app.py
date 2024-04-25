@@ -14,6 +14,14 @@ db1 = DB( # All Tables Except The Ratings
     port="5432"
 )
 
+# db1 = DB( # All Tables Except The Ratings
+#     dbname="vercel_db_35rb",
+#     user="vercel_db_35rb_user",
+#     password="dSYKqdUoLtuKhljWHsE4I0lcl29UxIni",
+#     host="dpg-coku3qud3nmc739lls40-a.oregon-postgres.render.com",
+#     port="5432"
+# )
+
 db2 = DB( # Ratings Table
     dbname="recommendation_cbnm",
     user="recommendation_cbnm_user",
@@ -35,6 +43,9 @@ def process_data():
     if count < 5:
         recommendations = db2.popular_movies()
     else:
+        if not db1.check_user(data['id']):
+            return json.dumps({'error': 'User not found'})
+        
         ratings = db2.get_ratings(data['id'])
         print(f"\nuser {data['id']} watched movies:")
         print(db1.get_movie_titles(ratings['movieid']))
