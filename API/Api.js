@@ -7,21 +7,18 @@ const port = 3000;
 
 app.use(bodyParser.json());
 
-// Route to receive data from Flutter
 app.post('/data', (req, res) => {
   const flutterData = req.body;
 
-  // Send data to Python script
   axios.post('https://movie-recommendation-api-jyof.onrender.com/process-data', flutterData)
     .then((response) => {
       console.log(response.data);
-      res.send(response.data); // Optionally, send response back to Flutter
+      res.json(response.data);
     })
     .catch((error) => {
       console.error(error);
-      res.status(500).send('Error processing data');
+      res.status(500).json({ error: 'Error processing data' });
     });
-
 });
 
 app.listen(port, () => {
