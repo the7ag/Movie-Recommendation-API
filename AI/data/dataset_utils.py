@@ -1,6 +1,7 @@
 import pandas as pd
 import psycopg2
 
+
 class DB:
     def __init__(self, *args, **kwargs):
         self.conn = psycopg2.connect(*args, **kwargs)
