@@ -10,14 +10,14 @@ app.use(bodyParser.json());
 app.post('/data', (req, res) => {
   const flutterData = req.body;
 
-  axios.post('https://movie-recommendation-api-jyof.onrender.com/process-data', flutterData)
+  axios.post('https://movie-recommendation-api-jyof.onrender.com:5000/process-data', flutterData)
     .then((response) => {
       console.log(response.data);
-      res.json(response.data);
+      res.send(response.data);
     })
     .catch((error) => {
       console.error(error);
-      res.status(500).json({ error: 'Error processing data' });
+      res.status(500).send('Error processing data');
     });
 });
 

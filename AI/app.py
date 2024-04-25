@@ -1,7 +1,8 @@
 from data.dataset_utils import DB
 from models.content_based_filtering import KNNRecommender
 from models.collaborative_filtering import AutoEncoder
-from flask import Flask, request, jsonify
+from flask import Flask, request
+import json
 
 
 db1 = DB( # All Tables Except The Ratings
@@ -27,36 +28,36 @@ ae = AutoEncoder()
 @app.route('/process-data', methods=['POST'])
 def process_data():
     data = request.json
-    if data is None:
-        return jsonify({'error': 'No data provided'}), 400
-    if 'id' not in data or not db1.check_user(data['id']):
-        return jsonify({'error': 'Invalid user ID'}), 404
-        
+    if data is None or 'id' not in data:
+        return json.dumps({'error': 'No id provided'})
+    if not db1.check_user(data['id']):
+        return json.dumps({'error': 'User not found'})
+
     count = db2.get_watch_count(data['id'])
     if count < 5:
         recommendations = db2.popular_movies()
-    else:
+    else:    
         ratings = db2.get_ratings(data['id'])
         print(f"\nuser {data['id']} watched movies:")
         print(db1.get_movie_titles(ratings['movieid']))
-
+        
         if not knn.check(ratings['movieid']):
             print("\nRetraining KNN...")
             knn.train(db1.get_table('movies'))
-
+        
         print("\nSearching Using Content Based Filtering...")
         recommendations = knn.predict(ratings)
-
+                        
         if ae.check(data['id'], recommendations):
             print("\nSorting Using Collabritive Filtering...")
             recommendations = ae.sort(data['id'], recommendations)
         else:
             recommendations = recommendations[:10]
-            
+
     print(f"\nuser {data['id']} recommended movies:")
     print(db1.get_movie_titles(recommendations))
     db1.update_recommendations(data['id'], recommendations)
-    return jsonify({'recommendations': recommendations}), 200
+    return json.dumps({'recommendations': recommendations})
 
 if __name__ == '__main__':
     app.run()
