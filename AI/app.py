@@ -7,20 +7,12 @@ import json
 
 
 db1 = DB( # All Tables Except The Ratings
-    dbname="verceldb",
-    user="default",
-    password="I6v0XghdjVAW",
-    host="ep-nameless-forest-a4upu4jj.us-east-1.aws.neon.tech",
+    dbname="vercel_db_35rb",
+    user="vercel_db_35rb_user",
+    password="dSYKqdUoLtuKhljWHsE4I0lcl29UxIni",
+    host="dpg-coku3qud3nmc739lls40-a.oregon-postgres.render.com",
     port="5432"
 )
-
-# db1 = DB( # All Tables Except The Ratings
-#     dbname="vercel_db_35rb",
-#     user="vercel_db_35rb_user",
-#     password="dSYKqdUoLtuKhljWHsE4I0lcl29UxIni",
-#     host="dpg-coku3qud3nmc739lls40-a.oregon-postgres.render.com",
-#     port="5432"
-# )
 
 db2 = DB( # Ratings Table
     dbname="recommendation_cbnm",
