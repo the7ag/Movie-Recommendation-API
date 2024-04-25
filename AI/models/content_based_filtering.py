@@ -20,8 +20,8 @@ class KNNRecommender:
         
 
     def _format(self, features):
-        # features = features.replace('{', '').replace('}', '')\
-        #     .replace('[', '').replace(']', '').replace('"', '').split(',')
+        # features = features.replace('{', '').replace('}', '').replace('[', '')\
+        # .replace(']', '').replace('"', '').replace("'", '').split(',')
         features = [f.replace(' ', '') for f in features]
         return ' '.join(features)
     

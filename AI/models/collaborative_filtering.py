@@ -57,7 +57,7 @@ class AutoEncoder:
         model.compile(optimizer='SGD', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
         model.fit([users, movies], classes, epochs=10, batch_size=1024)
         model.save(self.model_path)
-        
+        tf.keras.backend.clear_session()
         
     def smooth_score(self, prediction):
         return np.sum(prediction * np.arange(1, 11))

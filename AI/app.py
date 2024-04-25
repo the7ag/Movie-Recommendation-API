@@ -1,6 +1,6 @@
 from data.dataset_utils import DB
 from models.content_based_filtering import KNNRecommender
-# from models.collaborative_filtering import AutoEncoder
+from models.collaborative_filtering import AutoEncoder
 from flask import Flask, request
 import pandas as pd
 import json
@@ -24,7 +24,7 @@ db2 = DB( # Ratings Table
 
 app = Flask(__name__)
 knn = KNNRecommender()
-# ae = AutoEncoder()
+ae = AutoEncoder()
 
 @app.route('/process-data', methods=['POST'])
 def process_data():
@@ -46,11 +46,11 @@ def process_data():
         print("\nSearching Using Content Based Filtering...")
         recommendations = knn.predict(ratings)
                         
-        # if ae.check(data['id'], recommendations):
-        #     print("\nSorting Using Collabritive Filtering...")
-        #     recommendations = ae.sort(data['id'], recommendations)
-        # else:
-        recommendations = recommendations[:10]
+        if ae.check(data['id'], recommendations):
+            print("\nSorting Using Collabritive Filtering...")
+            recommendations = ae.sort(data['id'], recommendations)
+        else:
+            recommendations = recommendations[:10]
             
     
     print(f"\nuser {data['id']} recommended movies:")
