@@ -30,14 +30,13 @@ ae = AutoEncoder()
 def process_data():
     data = request.json
     if data is None: return json.dumps({'error': 'No data provided'})
-    
+    if not db1.check_user(data['id']):
+            return json.dumps({'error': 'User not found'})
+        
     count = db2.get_watch_count(data['id'])
     if count < 5:
         recommendations = db2.popular_movies()
-    else:
-        if not db1.check_user(data['id']):
-            return json.dumps({'error': 'User not found'})
-        
+    else:    
         ratings = db2.get_ratings(data['id'])
         print(f"\nuser {data['id']} watched movies:")
         print(db1.get_movie_titles(ratings['movieid']))
