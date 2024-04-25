@@ -6,3 +6,4 @@ psycopg2==2.9.9
 scikit_learn==1.4.2
 scipy==1.13.0
 tensorflow==2.16.1
+gunicorn==22.0.0
