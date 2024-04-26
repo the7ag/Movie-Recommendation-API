@@ -4,7 +4,11 @@ from models.collaborative_filtering import AutoEncoder
 from flask import Flask, request
 import json
 
-def connect():
+
+db1 = None
+db2 = None
+def connect_databases():
+    global db1, db2
     db1 = DB( # All Tables Except The Ratings
         dbname="vercel_db_35rb",
         user="vercel_db_35rb_user",
@@ -20,9 +24,8 @@ def connect():
         host="dpg-coklt16n7f5s738tii3g-a.oregon-postgres.render.com",
         port="5432"
     )
-    return db1, db2
 
-db1, db2 = connect()
+connect_databases()
 app = Flask(__name__)
 knn = KNNRecommender()
 ae = AutoEncoder()
@@ -34,7 +37,7 @@ def process_data():
         return json.dumps({'error': 'No id provided'})
     
     if not db1.check_connection() or not db2.check_connection():
-        db1, db2 = connect()
+        connect_databases()
                  
     if not db1.check_user(data['id']):
         return json.dumps({'error': 'User not found'})
