@@ -49,6 +49,7 @@ class KNNRecommender:
         moviedict = {}
         for movieid in movieids:
             features = self.features[movieid]
+            print(f"movieid: {movieid}, features: {features}")
             distances, indices = self.knn.kneighbors(features)
             indices = indices.flatten()
             distances = distances.flatten()
