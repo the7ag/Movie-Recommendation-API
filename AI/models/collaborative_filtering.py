@@ -77,7 +77,7 @@ class AutoEncoder:
     #     return sorted_movieids
     
     # more RAM efficient version of sort
-    def sort2(self, userid, movieids):
+    def sort(self, userid, movieids):
         userid = self.userid_map[self.userid_map['userid'] == str(userid)]['index'].values[0]
         movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
         predictions = np.zeros(len(movieids))
