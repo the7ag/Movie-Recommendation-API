@@ -2,5 +2,4 @@ package-lock.json
 node_modules/*
 .idea/*
 .vscode/*
-AI/data/__pycache__/*
-AI/models/__pycache__/*
+__pycache__/*
