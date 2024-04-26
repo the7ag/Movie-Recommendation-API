@@ -48,8 +48,7 @@ class KNNRecommender:
         movieids = self.movieid_map[self.movieid_map['movieid'].isin(ratings['movieid'])]['index']
         moviedict = {}
         for movieid in movieids:
-            features = self.features[movieid]
-            print(f"movieid: {movieid}, features: {features}")
+            features = self.features.getrow(movieid)
             distances, indices = self.knn.kneighbors(features)
             indices = indices.flatten()
             distances = distances.flatten()
@@ -67,3 +66,25 @@ class KNNRecommender:
         recs = recs[~recs.isin(ratings['movieid'])]
         recs = recs.tolist()[:20]
         return recs
+
+    # def predict(self, ratings):
+    #     movieids = self.movieid_map[self.movieid_map['movieid'].isin(ratings['movieid'])]['index']
+    #     moviedict = {}
+    #     features = self.features[movieids]
+    #     distances, indices = self.knn.kneighbors(features)
+    #     indices = indices.flatten()
+    #     distances = distances.flatten()
+
+    #     for index, distance in zip(indices, distances):
+    #         rating = ratings[ratings['movieid'] == self.movieid_map.loc[index, 'movieid']]['rating'].values[0]
+    #         distance /= rating**2
+    #         if index in moviedict:
+    #             moviedict[index] = min(moviedict[index], distance)
+    #         else:
+    #             moviedict[index] = distance
+
+    #     recs = [key for key, _ in sorted(moviedict.items(), key=lambda item: item[1])]
+    #     recs = self.movieid_map.loc[recs, 'movieid']
+    #     recs = recs[~recs.isin(ratings['movieid'])]
+    #     recs = recs.tolist()[:20]
+    #     return recs
