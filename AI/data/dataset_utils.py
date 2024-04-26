@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import psycopg2
 
 
@@ -31,17 +32,34 @@ class DB:
         ratings['movieid'] = ratings['movieid'].astype(str)
         return ratings
     
+    # def popular_movies(self, n=10):
+    #     self.cursor.execute("""
+    #         SELECT movieid, count(rating) * avg(rating) * avg(rating) AS score
+    #         FROM ratings
+    #         GROUP BY movieid
+    #         ORDER BY score DESC
+    #         LIMIT %s;
+    #         """, (n,))
+    #     popular_movies = pd.DataFrame(self.cursor.fetchall(), columns=['movieid', 'score'])
+    #     popular_movies = popular_movies['movieid'].astype(str).tolist()
+    #     return popular_movies
+    
     def popular_movies(self, n=10):
         self.cursor.execute("""
-            SELECT movieid, count(rating) * avg(rating) * avg(rating) AS score
-            FROM ratings
-            GROUP BY movieid
-            ORDER BY score DESC
-            LIMIT %s;
-            """, (n,))
-        popular_movies = pd.DataFrame(self.cursor.fetchall(), columns=['movieid', 'score'])
-        popular_movies = popular_movies['movieid'].astype(str).tolist()
-        return popular_movies
+            SELECT movieid
+            FROM (
+                SELECT movieid, COUNT(rating) * AVG(rating) * AVG(rating) AS score
+                FROM ratings
+                GROUP BY movieid
+                ORDER BY score DESC
+                LIMIT %s
+            ) AS top_movies;
+            """, (n * 2,))
+        
+        top_movies = self.cursor.fetchall()
+        movie_ids = [str(movie[0]) for movie in top_movies]
+        selected_movies = np.random.choice(movie_ids, size=min(n, len(movie_ids)), replace=False)
+        return selected_movies.tolist()
 
     def get_watch_count(self, user_id):
         try:
