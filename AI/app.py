@@ -59,8 +59,7 @@ def process_data():
                         
         if ae.check(data['id'], recommendations):
             print("\nSorting Using Collabritive Filtering...")
-            # recommendations = ae.sort(data['id'], recommendations)
-            recommendations = recommendations[:10]
+            recommendations = ae.sort(data['id'], recommendations)
         else:
             recommendations = recommendations[:10]
         
