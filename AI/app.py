@@ -57,11 +57,13 @@ def process_data():
         print("\nSearching Using Content Based Filtering...")
         recommendations = knn.predict(ratings)
                         
-        if ae.check(data['id'], recommendations):
-            print("\nSorting Using Collabritive Filtering...")
-            recommendations = ae.sort(data['id'], recommendations)
-        else:
-            recommendations = recommendations[:10]
+        # if ae.check(data['id'], recommendations):
+        #     print("\nSorting Using Collabritive Filtering...")
+        #     recommendations = ae.sort(data['id'], recommendations)
+        # else:
+        #     recommendations = recommendations[:10]
+        
+        recommendations = ae.sort(data['id'], recommendations)
 
     print(f"\nuser {data['id']} recommended movies:")
     print(db1.get_movie_titles(recommendations))
