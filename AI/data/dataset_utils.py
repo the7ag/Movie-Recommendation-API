@@ -45,21 +45,18 @@ class DB:
     #     return popular_movies
     
     def popular_movies(self, n=10):
-        self.cursor.execute("""
-            SELECT movieid
-            FROM (
-                SELECT movieid, COUNT(rating) * AVG(rating) * AVG(rating) AS score
-                FROM ratings
-                GROUP BY movieid
-                ORDER BY score DESC
-                LIMIT %s
-            ) AS top_movies;
-            """, (n * 2,))
+        hard_coded_movies = ['318', '296', '356', '2571', '593', '260', '2959',
+                             '527','858', '1196', '4993', '50', '7153', '1198',
+                             '5952', '1210', '110', '2858', '1', '58559', '79132',
+                             '480', '589', '47', '1270', '608', '2028', '457', '2762',
+                             '3578', '4226', '150', '1704', '32', '1193', '1197', '1221',
+                             '4306', '1136', '541', '364', '1291', '7361', '1213', '588',
+                             '4973', '1214', '1089', '590', '6539']
         
-        top_movies = self.cursor.fetchall()
-        movie_ids = [str(movie[0]) for movie in top_movies]
-        selected_movies = np.random.choice(movie_ids, size=min(n, len(movie_ids)), replace=False)
-        return selected_movies.tolist()
+        random_indices = np.random.choice(len(hard_coded_movies), n, replace=False)
+        random_indices.sort()
+        hard_coded_movies = [hard_coded_movies[i] for i in random_indices]
+        return hard_coded_movies
 
     def get_watch_count(self, user_id):
         try:
