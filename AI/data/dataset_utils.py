@@ -10,13 +10,20 @@ class DB:
     def check_connection(self):
         try:
             self.cursor.execute("SELECT 1;")
-            return bool(self.cursor.fetchone())
-        except:
+            result = self.cursor.fetchone()
+            return bool(result) if result else False
+        except Exception as e:
+            print(f"Error checking connection: {e}")
             return False
-        
+
     def check_user(self, user_id):
-        self.cursor.execute("SELECT * FROM users WHERE userid = %s;", (str(user_id),))
-        return bool(self.cursor.fetchone())
+        try:
+            self.cursor.execute("SELECT 1 FROM users WHERE userid = %s;", (str(user_id),))
+            result = self.cursor.fetchone()
+            return bool(result) if result else False
+        except Exception as e:
+            print(f"Error checking user: {e}")
+            return False
     
     def get_ratings(self, user_id):
         self.cursor.execute("SELECT movieid, rating FROM ratings WHERE userid = %s;", (str(user_id),))
@@ -35,11 +42,15 @@ class DB:
         popular_movies = pd.DataFrame(self.cursor.fetchall(), columns=['movieid', 'score'])
         popular_movies = popular_movies['movieid'].astype(str).tolist()
         return popular_movies
-    
+
     def get_watch_count(self, user_id):
-        self.cursor.execute("SELECT count(rating) FROM ratings WHERE userid = %s;", (str(user_id),))
-        count = self.cursor.fetchone()[0]
-        return count
+        try:
+            self.cursor.execute("SELECT COUNT(rating) FROM ratings WHERE userid = %s;", (str(user_id),))
+            result = self.cursor.fetchone()
+            return result[0] if result else 0
+        except Exception as e:
+            print(f"Error getting watch count: {e}")
+            return 0
 
     def get_movie_titles(self, movie_ids):
         movie_ids = [str(x) for x in movie_ids]

@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # import tensorflow as tf
+# import tf2onnx
 import onnxruntime as rt
 
 
@@ -24,6 +25,26 @@ class AutoEncoder:
         df = pd.DataFrame()
         df['movieid'] = movieids
         return (str(userid) in self.userid_map['userid'].values) and df['movieid'].isin(self.movieid_map['movieid'].astype(str)).all()
+        
+    def smooth_score(self, prediction):
+        return np.sum(prediction * np.arange(1, 11))
+    
+    def sort(self, userid, movieids):
+        userid = self.userid_map[self.userid_map['userid'] == str(userid)]['index'].values[0]
+        movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
+        predictions = np.zeros(len(movieids))
+        input_1 = np.array([[userid]], dtype=np.float32)
+        for i, movieid in enumerate(movieids):
+            input_2 = np.array([[movieid]], dtype=np.float32)
+            prediction = self.model.run(None, {'inputs': input_1, 'inputs_1': input_2})[0]
+            # prediction = self.model.predict([np.array([userid]), np.array([movieid])], verbose=0)
+            prediction = self.smooth_score(prediction)
+            predictions[i] = prediction
+        
+        indices = np.argsort(predictions)
+        sorted_movieids = movieids.iloc[indices]
+        sorted_movieids = self.movieid_map.loc[sorted_movieids, 'movieid'].tolist()[:10]
+        return sorted_movieids
     
     # def train(self, ratings):
     #     # load data
@@ -58,40 +79,7 @@ class AutoEncoder:
     #     model = tf.keras.Model(inputs=[user_input, movie_input], outputs=output_layer)
     #     model.compile(optimizer='SGD', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     #     model.fit([users, movies], classes, epochs=10, batch_size=1024)
-    #     model.save(self.model_path)
+    #     onnx_model = tf2onnx.convert.from_keras(model, input_signature=[tf.TensorSpec(shape=(None, 1), dtype=tf.float32),\
+    #     tf.TensorSpec(shape=(None, 1), dtype=tf.float32)])
+    #     onnx_model.save_model(self.model_path)
     #     tf.keras.backend.clear_session()
-        
-    def smooth_score(self, prediction):
-        return np.sum(prediction * np.arange(1, 11))
-    
-    # def sort(self, userid, movieids):
-    #     userid = self.userid_map[self.userid_map['userid'] == str(userid)]['index'].values[0]
-    #     movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
-    #     predictions = []
-    #     for movieid in movieids:
-    #         prediction = self.model.predict([np.array([userid]), np.array([movieid])], verbose=0)
-    #         prediction = self.smooth_score(prediction)
-    #         predictions.append((movieid, prediction))
-        
-    #     predictions = sorted(predictions, key=lambda x: x[1])
-    #     sorted_movieids = [movieid for movieid, _ in predictions]
-    #     sorted_movieids = self.movieid_map.loc[sorted_movieids, 'movieid'].tolist()[:10]
-    #     return sorted_movieids
-    
-    # more RAM efficient version of sort
-    def sort(self, userid, movieids):
-        userid = self.userid_map[self.userid_map['userid'] == str(userid)]['index'].values[0]
-        movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
-        predictions = np.zeros(len(movieids))
-        input_1 = np.array([[userid]], dtype=np.float32)
-        for i, movieid in enumerate(movieids):
-            input_2 = np.array([[movieid]], dtype=np.float32)
-            prediction = self.model.run(None, {'inputs': input_1, 'inputs_1': input_2})[0]
-            # prediction = self.model.predict([np.array([userid]), np.array([movieid])], verbose=0)
-            prediction = self.smooth_score(prediction)
-            predictions[i] = prediction
-        
-        indices = np.argsort(predictions)
-        sorted_movieids = movieids.iloc[indices]
-        sorted_movieids = self.movieid_map.loc[sorted_movieids, 'movieid'].tolist()[:10]
-        return sorted_movieids
