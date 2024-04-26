@@ -7,6 +7,13 @@ class DB:
         self.conn = psycopg2.connect(*args, **kwargs)
         self.cursor = self.conn.cursor()
         
+    def check_connection(self):
+        try:
+            self.cursor.execute("SELECT 1;")
+            return bool(self.cursor.fetchone())
+        except:
+            return False
+        
     def check_user(self, user_id):
         self.cursor.execute("SELECT * FROM users WHERE userid = %s;", (str(user_id),))
         return bool(self.cursor.fetchone())
