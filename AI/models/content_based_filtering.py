@@ -53,8 +53,8 @@ class KNNRecommender:
             distances, indices = self.knn.kneighbors(features)
             indices = indices.flatten()
             distances = distances.flatten()
-            distances = distances / (ratings[ratings['movieid'] == \
-                self.movieid_map.loc[movieid, 'movieid']]['rating'].values[0])
+            rating = ratings[ratings['movieid'] == self.movieid_map.loc[movieid, 'movieid']]['rating'].values[0]
+            distances = distances / rating**2
             
             for index, distance in zip(indices, distances):
                 if index in moviedict:
