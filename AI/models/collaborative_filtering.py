@@ -62,16 +62,31 @@ class AutoEncoder:
     def smooth_score(self, prediction):
         return np.sum(prediction * np.arange(1, 11))
     
-    def sort(self, userid, movieids):
+    # def sort(self, userid, movieids):
+    #     userid = self.userid_map[self.userid_map['userid'] == str(userid)]['index'].values[0]
+    #     movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
+    #     predictions = []
+    #     for movieid in movieids:
+    #         prediction = self.model.predict([np.array([userid]), np.array([movieid])], verbose=0)
+    #         prediction = self.smooth_score(prediction)
+    #         predictions.append((movieid, prediction))
+        
+    #     predictions = sorted(predictions, key=lambda x: x[1])
+    #     sorted_movieids = [movieid for movieid, _ in predictions]
+    #     sorted_movieids = self.movieid_map.loc[sorted_movieids, 'movieid'].tolist()[:10]
+    #     return sorted_movieids
+    
+    # more RAM efficient version of sort
+    def sort2(self, userid, movieids):
         userid = self.userid_map[self.userid_map['userid'] == str(userid)]['index'].values[0]
         movieids = self.movieid_map[self.movieid_map['movieid'].isin(movieids)]['index']
-        predictions = []
-        for movieid in movieids:
+        predictions = np.zeros(len(movieids))
+        for i, movieid in enumerate(movieids):
             prediction = self.model.predict([np.array([userid]), np.array([movieid])], verbose=0)
             prediction = self.smooth_score(prediction)
-            predictions.append((movieid, prediction))
+            predictions[i] = prediction
         
-        predictions = sorted(predictions, key=lambda x: x[1])
-        sorted_movieids = [movieid for movieid, _ in predictions]
+        indices = np.argsort(predictions)
+        sorted_movieids = movieids.iloc[indices]
         sorted_movieids = self.movieid_map.loc[sorted_movieids, 'movieid'].tolist()[:10]
         return sorted_movieids
