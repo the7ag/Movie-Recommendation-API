@@ -43,6 +43,7 @@ def process_data():
         return json.dumps({'error': 'User not found'})
 
     count = db2.get_watch_count(data['id'])
+    print(f"\nuser {data['id']} watched {count} movies")
     if count < 5:
         recommendations = db2.popular_movies()
     else:    
