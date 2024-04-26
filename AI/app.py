@@ -13,8 +13,6 @@ def process_data():
     data = request.json
     if data is None or 'id' not in data:
         return json.dumps({'error': 'No id provided'})
-    if not db1.check_user(data['id']):
-        return json.dumps({'error': 'User not found'})
     
     db1 = DB( # All Tables Except The Ratings
     dbname="vercel_db_35rb",
@@ -23,6 +21,9 @@ def process_data():
     host="dpg-coku3qud3nmc739lls40-a.oregon-postgres.render.com",
     port="5432"
     )
+    
+    if not db1.check_user(data['id']):
+        return json.dumps({'error': 'User not found'})
 
     db2 = DB( # Ratings Table
         dbname="recommendation_cbnm",
