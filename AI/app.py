@@ -44,8 +44,11 @@ def process_data():
 
     count = db2.get_watch_count(data['id'])
     print(f"\nuser {data['id']} watched {count} movies")
-    if count < 5:
+    if count == 0:
         recommendations = db2.popular_movies()
+    elif count < 5:
+        ratings = db2.get_ratings(data['id'])
+        recommendations = db2.popular_movies(movieids=ratings['movieid'])
     else:    
         ratings = db2.get_ratings(data['id'])
         print(f"\nuser {data['id']} watched movies:")

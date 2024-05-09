@@ -44,7 +44,7 @@ class DB:
     #     popular_movies = popular_movies['movieid'].astype(str).tolist()
     #     return popular_movies
     
-    def popular_movies(self, n=10):
+    def popular_movies(self, movieids=None, n=10):
         hard_coded_movies = ['318', '296', '356', '2571', '593', '260', '2959',
                              '527','858', '1196', '4993', '50', '7153', '1198',
                              '5952', '1210', '110', '2858', '1', '58559', '79132',
@@ -52,7 +52,10 @@ class DB:
                              '3578', '4226', '150', '1704', '32', '1193', '1197', '1221',
                              '4306', '1136', '541', '364', '1291', '7361', '1213', '588',
                              '4973', '1214', '1089', '590', '6539']
-        
+        if movieids is not None:
+            movieids = set(movieids.tolist())
+            hard_coded_movies = [movieid for movieid in hard_coded_movies if movieid not in movieids]
+            
         random_indices = np.random.choice(len(hard_coded_movies), n, replace=False)
         random_indices.sort()
         hard_coded_movies = [hard_coded_movies[i] for i in random_indices]
