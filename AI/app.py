@@ -10,7 +10,7 @@ db1 = None
 db2 = None
 def connect_databases():
     global db1, db2
-    db1 = DB( # All Tables
+    db1 = DB(
         dbname="vercel_db_35rb",
         user="vercel_db_35rb_user",
         password="dSYKqdUoLtuKhljWHsE4I0lcl29UxIni",
@@ -18,13 +18,13 @@ def connect_databases():
         port="5432"
     )
 
-    db2 = DB( # Ratings Table
-        dbname="recommendation_cbnm",
-        user="recommendation_cbnm_user",
-        password="E9zEBx0r87RKMbzl1uqxaPbp67EG9gwC",
-        host="dpg-coklt16n7f5s738tii3g-a.oregon-postgres.render.com",
-        port="5432"
-    )
+    # db2 = DB( # Ratings Table
+    #     dbname="recommendation_cbnm",
+    #     user="recommendation_cbnm_user",
+    #     password="E9zEBx0r87RKMbzl1uqxaPbp67EG9gwC",
+    #     host="dpg-coklt16n7f5s738tii3g-a.oregon-postgres.render.com",
+    #     port="5432"
+    # )
 
 connect_databases()
 app = Flask(__name__)
