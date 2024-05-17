@@ -17,14 +17,14 @@ def connect_databases():
         host="dpg-coku3qud3nmc739lls40-a.oregon-postgres.render.com",
         port="5432"
     )
-
-    # db2 = DB( # Ratings Table
-    #     dbname="recommendation_cbnm",
-    #     user="recommendation_cbnm_user",
-    #     password="E9zEBx0r87RKMbzl1uqxaPbp67EG9gwC",
-    #     host="dpg-coklt16n7f5s738tii3g-a.oregon-postgres.render.com",
-    #     port="5432"
-    # )
+    
+    db2 = DB( # Ratings Table
+        dbname='recommendation_hiw1',
+        user='recommendation_hiw1_user',
+        password='hXaWqgMKbbGGMPbtL1dEdLPAF1pMC2Lm',
+        host='dpg-cp3ru0g21fec73bdfr5g-a.oregon-postgres.render.com',
+        port='5432'
+    )  
 
 connect_databases()
 app = Flask(__name__)
