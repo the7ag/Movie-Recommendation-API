@@ -2,6 +2,7 @@ const express = require('express')
 const { Pool } = require('pg');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const bcrypt = require('bcrypt');
 
 const app = express()
 const port = 3000
@@ -167,13 +168,23 @@ app.get('/', (req, res) => {
   }
   
   app.post('/signup', async (req, res) => {
-    const { username, email, password } = req.body;
-    const uniqueId = generateUniqueId();
+    const { username, email, password } = req.body;   
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).send({ message: 'Invalid email format' });
+    }
     try {
-        const query = 'INSERT INTO users (userid, username, email, password) VALUES ($1, $2, $3, $4) RETURNING userid';
-        const result = await pool.query(query, [uniqueId, username, email, password]);
+        const emailCheckQuery = 'SELECT * FROM users WHERE email = $1';
+        const emailCheckResult = await pool.query(emailCheckQuery, [email]);
+        if (emailCheckResult.rows.length > 0) {
+            return res.status(409).send({ message: 'Email already exists' });
+        }
+        const hashedPassword = await bcrypt.hash(password, 10); // Adjust the salt rounds as needed
+        const uniqueId = generateUniqueId();
+        const insertQuery = 'INSERT INTO users (userid, username, email, password) VALUES ($1, $2, $3, $4) RETURNING userid';
+        const result = await pool.query(insertQuery, [uniqueId, username, email, hashedPassword]);
         if (result.rows.length > 0) {
-            res.status(201).send({ message: 'New user created', AddedID: result.rows[0].userid });
+            res.status(201).send({ message: 'New user created', addedID: result.rows[0].userid });
         } else {
             res.status(500).send({ message: 'Failed to create new user' });
         }
@@ -184,19 +195,25 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const query = 'SELECT * FROM users WHERE email = $1 AND password = $2';
-        const result = await pool.query(query, [email, password]);
-        if (result.rows.length > 0) {
-            res.status(200).send({ message: 'Login successful',Userid: result.rows[0].userid });
-        } else {
-            res.status(401).send({ message: 'Invalid login credentials' });
-        }
-    } catch (err) {
-        console.error('Error during login:', err);
-        res.status(500).send('An error occurred during login');
-    }
+  const { email, password } = req.body;
+  try {
+      const query = 'SELECT * FROM users WHERE email = $1';
+      const result = await pool.query(query, [email]);
+      if (result.rows.length > 0) {
+          const user = result.rows[0];
+          const passwordMatch = await bcrypt.compare(password, user.password);
+          if (passwordMatch) {
+              res.status(200).send({ message: 'Login successful', AddedID: user.userid });
+          } else {
+              res.status(401).send({ message: 'Invalid login credentials' });
+          }
+      } else {
+          res.status(401).send({ message: 'Invalid login credentials' });
+      }
+  } catch (err) {
+      console.error('Error during login:', err);
+      res.status(500).send('An error occurred during login');
+  }
 });
 
 function generateTimestamp()
