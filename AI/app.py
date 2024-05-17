@@ -2,6 +2,7 @@ from data.dataset_utils import DB
 from models.content_based_filtering import KNNRecommender
 from models.collaborative_filtering import AutoEncoder
 from flask import Flask, request
+import pandas as pd
 import json
 
 
@@ -41,16 +42,22 @@ def process_data():
                  
     if not db1.check_user(data['id']):
         return json.dumps({'error': 'User not found'})
-
-    count = db2.get_watch_count(data['id'])
+    
+    count1 = db1.get_watch_count(data['id'])
+    count2 = db2.get_watch_count(data['id'])
+    count = count1 + count2
     print(f"\nuser {data['id']} watched {count} movies")
     if count == 0:
         recommendations = db2.popular_movies()
     elif count < 5:
-        ratings = db2.get_ratings(data['id'])
+        ratings1 = db1.get_ratings(data['id'])
+        ratings2 = db2.get_ratings(data['id'])
+        ratings = pd.concat([ratings1, ratings2])
         recommendations = db2.popular_movies(movieids=ratings['movieid'])
     else:    
-        ratings = db2.get_ratings(data['id'])
+        ratings1 = db1.get_ratings(data['id'])
+        ratings2 = db2.get_ratings(data['id'])
+        ratings = pd.concat([ratings1, ratings2])
         print(f"\nuser {data['id']} watched movies:")
         print(db1.get_movie_titles(ratings['movieid']))
         
