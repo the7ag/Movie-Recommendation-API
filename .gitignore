@@ -1,6 +1,6 @@
 package-lock.json
-node_modules/*
-.idea/*
-.vscode/*
-AI/data/__pycache__/*
-AI/models/__pycache__/*
+node_modules/
+.idea/
+.vscode/
+# AI/data/__pycache__/
+# AI/models/__pycache__/
