@@ -10,7 +10,7 @@ db1 = None
 db2 = None
 def connect_databases():
     global db1, db2
-    db1 = DB( # All Tables Except The Ratings
+    db1 = DB( # All Tables
         dbname="vercel_db_35rb",
         user="vercel_db_35rb_user",
         password="dSYKqdUoLtuKhljWHsE4I0lcl29UxIni",
