@@ -11,17 +11,15 @@ class DB:
     def check_connection(self):
         try:
             self.cursor.execute("SELECT 1;")
-            result = self.cursor.fetchone()
-            return bool(result) if result else False
+            return self.cursor.fetchone() is not None
         except Exception as e:
             print(f"Error checking connection: {e}")
             return False
-
+        
     def check_user(self, user_id):
         try:
             self.cursor.execute("SELECT 1 FROM users WHERE userid = %s;", (str(user_id),))
-            result = self.cursor.fetchone()
-            return bool(result) if result else False
+            return self.cursor.fetchone() is not None
         except Exception as e:
             print(f"Error checking user: {e}")
             return False
