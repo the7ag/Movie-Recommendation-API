@@ -1,5 +1,6 @@
 import os
 import joblib
+import numpy as np
 import pandas as pd
 from scipy.sparse import hstack
 from sklearn.neighbors import NearestNeighbors
@@ -43,27 +44,15 @@ class KNNRecommender:
         features = hstack([title, genres, cast])
         joblib.dump(features, self.knn_path)
     
-    
     def predict(self, ratings):
         movieids = self.movieid_map[self.movieid_map['movieid'].isin(ratings['movieid'])]['index']
-        moviedict = {}
-        for movieid in movieids:
-            features = self.features[movieid]
-            features = features.toarray().reshape(1, -1)
-            distances, indices = self.knn.kneighbors(features)
-            indices = indices.flatten()
-            distances = distances.flatten()
-            rating = ratings[ratings['movieid'] == self.movieid_map.loc[movieid, 'movieid']]['rating'].values[0]
-            distances = distances / rating**2
-            
-            for index, distance in zip(indices, distances):
-                if index in moviedict:
-                    moviedict[index] = min(moviedict[index], distance)
-                else:
-                    moviedict[index] = distance
-                    
-        recs = [key for key, _ in sorted(moviedict.items(), key=lambda item: item[1])]
+        moviedict = np.inf * np.ones(self.features.shape[0])
+        features = self.features[movieids]
+        distances, indices = self.knn.kneighbors(features)
+        distances = distances / (np.array(ratings['rating'])[:, np.newaxis]**2 + 1)
+        for dist_row, idx_row in zip(distances, indices):
+            moviedict[idx_row] = np.minimum(moviedict[idx_row], dist_row)
+        recs = np.argsort(moviedict)
         recs = self.movieid_map.loc[recs, 'movieid']
-        recs = recs[~recs.isin(ratings['movieid'])]
-        recs = recs.tolist()[:20]
-        return recs
+        recs = recs[~recs.isin(ratings['movieid'])].tolist()
+        return recs[:20]
