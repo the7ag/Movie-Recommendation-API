@@ -58,30 +58,24 @@ def process_data():
         print(f"\nuser {data['id']} watched movies:")
         print(db1.get_movie_titles(ratings['movieid']))
         
-        start_time_knn = time.time()
         if not knn.check(ratings['movieid']):
             print("\nRetraining KNN...")
             knn.train(db1.get_table('movies'))
         
         print("\nSearching Using Content Based Filtering...")
         recommendations = knn.predict(ratings)
-        end_time_knn = time.time()
         
-        start_time_ae = time.time()
         if ae.check(data['id'], recommendations):
             print("\nSorting Using Collabritive Filtering...")
             recommendations = ae.sort(data['id'], recommendations)
         else:
             recommendations = recommendations[:10]
-        end_time_ae = time.time()
         
     print(f"\nuser {data['id']} recommended movies:")
     print(db1.get_movie_titles(recommendations))
     db1.update_recommendations(data['id'], recommendations)
     end_time = time.time()
     print(f"\nTime taken: {end_time - start_time}")
-    print(f"\nTime taken for KNN: {end_time_knn - start_time_knn}")
-    print(f"\nTime taken for AE: {end_time_ae - start_time_ae}")
     return json.dumps({'recommendations': recommendations})
 
 if __name__ == '__main__':
