@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.post('/data', (req, res) => {
   const flutterData = req.body;
 
-  axios.post('http://localhost:5000/process-data', flutterData)
+  axios.post('http://127.0.0.1:5000/process-data', flutterData)
     .then((response) => {
       console.log(response.data);
       res.send(response.data);

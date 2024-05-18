@@ -49,11 +49,10 @@ class KNNRecommender:
         moviedict = np.inf * np.ones(self.features.shape[0])
         features = self.features[movieids]
         distances, indices = self.knn.kneighbors(features)
-        distances = distances / ratings['rating'][:, np.newaxis]**2
+        distances = distances / np.array(ratings['rating'])[:, np.newaxis]**2
         for dist_row, idx_row in zip(distances, indices):
             moviedict[idx_row] = np.minimum(moviedict[idx_row], dist_row)
-            
-        recs = np.argsort(moviedict)[:20]
+        recs = np.argsort(moviedict)
         recs = self.movieid_map.loc[recs, 'movieid']
         recs = recs[~recs.isin(ratings['movieid'])].tolist()
-        return recs
+        return recs[:20]
