@@ -3,6 +3,7 @@ from models.content_based_filtering import KNNRecommender
 from models.collaborative_filtering import AutoEncoder
 from flask import Flask, request
 import pandas as pd
+import time
 import json
 
 
@@ -33,6 +34,7 @@ ae = AutoEncoder()
 
 @app.route('/process-data', methods=['POST'])
 def process_data():
+    start_time = time.time()
     data = request.json
     if data is None or 'id' not in data:
         return json.dumps({'error': 'No id provided'})
@@ -77,6 +79,8 @@ def process_data():
     print(f"\nuser {data['id']} recommended movies:")
     print(db1.get_movie_titles(recommendations))
     db1.update_recommendations(data['id'], recommendations)
+    end_time = time.time()
+    print(f"\nTime taken: {end_time - start_time}")
     return json.dumps({'recommendations': recommendations})
 
 if __name__ == '__main__':
