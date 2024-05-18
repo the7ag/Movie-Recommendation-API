@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.post('/data', (req, res) => {
   const flutterData = req.body;
 
-  axios.post('https://movie-recommendation-api-jyof.onrender.com/process-data', flutterData)
+  axios.post('http://localhost:5000/process-data', flutterData)
     .then((response) => {
       console.log(response.data);
       res.send(response.data);

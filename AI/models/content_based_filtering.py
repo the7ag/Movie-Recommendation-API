@@ -46,7 +46,7 @@ class KNNRecommender:
     
     def predict(self, ratings):
         movieids = self.movieid_map[self.movieid_map['movieid'].isin(ratings['movieid'])]['index']
-        moviedict = np.inf * np.ones(len(self.features))
+        moviedict = np.inf * np.ones(self.features.shape[0])
         features = self.features[movieids]
         distances, indices = self.knn.kneighbors(features)
         distances = distances / ratings['rating'][:, np.newaxis]**2
