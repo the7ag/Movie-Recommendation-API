@@ -45,9 +45,11 @@ def process_data():
     if not db1.check_user(data['id']):
         return json.dumps({'error': 'User not found'})
     
+    start_time_count = time.time()
     count1 = db1.get_watch_count(data['id'])
     count2 = db2.get_watch_count(data['id'])
     count = count1 + count2
+    end_time_count = time.time()
     print(f"\nuser {data['id']} watched {count} movies")
     if count == 0:
         recommendations = db2.popular_movies()
@@ -56,10 +58,12 @@ def process_data():
         ratings2 = db2.get_ratings(data['id'])
         ratings = pd.concat([ratings1, ratings2])
         recommendations = db2.popular_movies(movieids=ratings['movieid'])
-    else:    
+    else:
+        start_time_fetch = time.time()    
         ratings1 = db1.get_ratings(data['id'])
         ratings2 = db2.get_ratings(data['id'])
         ratings = pd.concat([ratings1, ratings2])
+        end_time_fetch = time.time()
         print(f"\nuser {data['id']} watched movies:")
         print(db1.get_movie_titles(ratings['movieid']))
         
@@ -81,6 +85,8 @@ def process_data():
     db1.update_recommendations(data['id'], recommendations)
     end_time = time.time()
     print(f"\nTime taken: {end_time - start_time}")
+    print(f"\nTime taken to count: {end_time_count - start_time_count}")
+    print(f"\nTime taken to fetch: {end_time_fetch - start_time_fetch}")
     return json.dumps({'recommendations': recommendations})
 
 if __name__ == '__main__':
