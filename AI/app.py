@@ -46,6 +46,7 @@ def process_data():
         return json.dumps({'error': 'User not found'})
     
     ratings1 = db1.get_ratings(data['id'])
+    ratings1['rating'] = ratings1['rating'] * 2
     ratings2 = db2.get_ratings(data['id'])
     ratings = pd.concat([ratings1, ratings2])
     count = len(ratings)
